@@ -8,7 +8,7 @@
 #define ESPACE_NOIR_HAUT 35
 #define ESPACE_NOIR_BAS 85
 #define MAX_PASTILLES 10 // Nombre max de pastilles
-#define MAX_LONGUEUR_SERPENT 100
+#define MAX_LONGUEUR_SERPENT 1000
 
 typedef struct {
     int x;
@@ -20,7 +20,7 @@ typedef struct {
     int y;
 } Pastille;
 
-int go_on = 1;  // Déclarer go_on en tant que variable globale
+int go_on = 1;  // Déclarer ces variables en tant que variable globale
 int pause = 0;
 int fin = 0;
 int longueurSerpent = 10;
@@ -33,46 +33,37 @@ Segment serpent[MAX_LONGUEUR_SERPENT];
 Pastille pastilles[MAX_PASTILLES];
 
 // ...
+/* Fonction récursive permettant d'afficher au moment de l'initialisation un nombre donné en paramètre de pastille Rouge */
+void afficherPastilleAleatoire(int z) {
+    int i;
+        couleur rouge = CouleurParNom("red");
+       
 
-void genererNouvellePositionPastille() {
-    positionPastilleX = (rand() % 56 + 5) * TAILLE_CELLULE ;
-    positionPastilleY = (rand() % 36 + 5) * TAILLE_CELLULE ;
-}
-
-
-void initialiserPastilles() {
-    for (int i = 0; i < MAX_PASTILLES; i++) {
-        pastilles[i].x = -1; // Initialiser à une position invalide
-        pastilles[i].y = -1;
-    }
-}
-
-void afficherPastilles() {
-    couleur rouge = CouleurParNom("red");
-    ChoisirCouleurDessin(rouge);
-    for (int i = 0; i < MAX_PASTILLES; i++) {
-        if (pastilles[i].x != -1 && pastilles[i].y != -1) {
-            RemplirRectangle(pastilles[i].x, pastilles[i].y, TAILLE_CELLULE, TAILLE_CELLULE);
+        for (i = 0; i < z; ++i)
+        {
+            positionPastilleX = (rand() % 56 + 5) * TAILLE_CELLULE;
+            positionPastilleY = (rand() % 36 + 5) * TAILLE_CELLULE;
+            ChoisirCouleurDessin(rouge);
+            RemplirRectangle(positionPastilleX, positionPastilleY, TAILLE_CELLULE, TAILLE_CELLULE);
         }
-    }
 }
+
 
 
 void ajouterPastille() {
+    int i;
+    couleur rouge = CouleurParNom("red");
     for (int i = 0; i < MAX_PASTILLES; i++) {
         if (pastilles[i].x == -1 && pastilles[i].y == -1) {
-            pastilles[i].x = positionPastilleX;
             pastilles[i].y = positionPastilleY;
+            ChoisirCouleurDessin(rouge);
+            RemplirRectangle(positionPastilleX,positionPastilleY,TAILLE_CELLULE,TAILLE_CELLULE);
             break;
         }
     }
 }
 
-void augmenterSerpent(Segment serpent[]) {
-    serpent[longueurSerpent].x = serpent[longueurSerpent - 1].x;
-    serpent[longueurSerpent].y = serpent[longueurSerpent - 1].y;
-    longueurSerpent++;
-}
+
 
 
 void mangerPastille() {
@@ -85,20 +76,22 @@ void mangerPastille() {
                 pastilles[i].y = -1;
 
                 // Ajouter un nouveau segment à la tête du serpent
-                serpent[longueurSerpent].x = serpent[longueurSerpent - 1].x;
-                serpent[longueurSerpent].y = serpent[longueurSerpent - 1].y;
+    serpent[longueurSerpent].x = serpent[longueurSerpent - 1].x;
+    serpent[longueurSerpent].y = serpent[longueurSerpent - 1].y;
 
-                // Augmenter la longueur du serpent
-                longueurSerpent++;
-
+    // Augmenter la longueur du serpent
+    longueurSerpent++;
                 // Générer une nouvelle position pour la pastille
-                genererNouvellePositionPastille();
-                ajouterPastille();
+                
 
                 break;
             }
+            afficherPastilleAleatoire(1);
         }
+        
+        break;
     }
+    
 }
 
 
@@ -134,6 +127,8 @@ void afficherPause() {
 
     ChoisirCouleurDessin(blanc);
     EcrireTexte(LARGEUR / 2 - 40, HAUTEUR / 2, "PAUSE", 2);
+    EffacerEcran(1);
+    ChoisirEcran(1);
 }
 
 
@@ -169,24 +164,6 @@ void Ecran() {
     }
 }
 
-/* Fonction récursive permettant d'afficher au moment de l'initialisation un nombre donné en paramètre de pastille Rouge */
-void afficherPastilleAleatoire(int z) {
-    int i;
-        couleur rouge = CouleurParNom("red");
-       
-
-        for (i = 0; i < z; ++i)
-        {
-            genererNouvellePositionPastille();
-            ChoisirCouleurDessin(rouge);
-            RemplirRectangle(positionPastilleX, positionPastilleY, TAILLE_CELLULE, TAILLE_CELLULE);
-        }
-      
-    
-    // il faut une limite
-}
-
-// ...
 
 void deplacerSerpent(int longueurSerpent, Segment serpent[], int direction) {
     int i;
@@ -232,9 +209,13 @@ void deplacerSerpent(int longueurSerpent, Segment serpent[], int direction) {
         break;
     }
 
-   
+   // Ajouter un nouveau segment à la tête du serpent
+    serpent[longueurSerpent].x = serpent[longueurSerpent - 1].x;
+    serpent[longueurSerpent].y = serpent[longueurSerpent - 1].y;
 
-    // ...
+    // Augmenter la longueur du serpent
+    longueurSerpent++;
+   
 
     for (i = 0; i < longueurSerpent; i++) {
         ChoisirCouleurDessin(jaune);
@@ -272,10 +253,8 @@ int main() {
     EffacerEcran(noir);
     Ecran();
     afficherPastilleAleatoire(5);
-     genererNouvellePositionPastille();
     afficherSerpent(serpent, longueurSerpent);
-    initialiserPastilles();
-    afficherPastilles();
+    
 
     while (go_on && !fin) {
         int touche;
@@ -314,6 +293,7 @@ int main() {
         if(!pause) {
              deplacerSerpent(longueurSerpent, serpent, direction);
              mangerPastille();
+             
         } else {
             afficherPause();
         }

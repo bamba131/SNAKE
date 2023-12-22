@@ -1,0 +1,1 @@
+alias prog="gcc -o"
